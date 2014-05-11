@@ -1,5 +1,5 @@
 var assert = require('assert');
-var createRouter = require("../index.js")
+var createRouter = require("../index.js").createRouter;
 
 suite('router config',function(){
 

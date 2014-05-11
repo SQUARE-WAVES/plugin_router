@@ -37,7 +37,7 @@ Router.prototype.match = function(reqUrl) {
 //			MEH, should this thing put up errors or something?
 //-----------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-module.exports = function createRouter(overlays,routes,callback) {
+var createRouter = function(overlays,routes,callback) {
 
 	var basePackage = theWorks.config.overlay(overlays);
 	var builder = theWorks.createBuilder();
@@ -60,3 +60,11 @@ module.exports = function createRouter(overlays,routes,callback) {
 		callback(null,new Router(routeSchemas,routePackages));
 	});
 }
+
+module.exports.createRouter = createRouter;
+
+module.exports.plugin = function(options,callback){
+	
+	var overlays = options.overlays || [];
+	createRouter(options.overlays,options.routes,callback);
+};
