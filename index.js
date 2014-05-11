@@ -17,13 +17,13 @@ var Router = function(schemas,packages) {
 	});
 };
 
-Router.prototype.match = function(reqUrl) {
+Router.prototype.match = function(path) {
 	
 	var self = this;
 
 	return self.routeTable.map(function(route){
 		return {
-			'params': route.matcher(reqUrl),
+			'params': route.matcher(path),
 			'package': self.packages[route.name]
 		}
 	})
@@ -68,8 +68,3 @@ var createRouter = function(overlays,routes,builderCustomizations,callback) {
 
 module.exports.createRouter = createRouter;
 
-module.exports.plugin = function(options,callback){
-	
-	var overlays = options.overlays || [];
-	createRouter(options.overlays,options.routes,callback);
-};
