@@ -1,0 +1,23 @@
+{
+  "name": "plugin-router",
+  "version": "0.0.0",
+  "description": "a router that uses theWorks to configure it's routes",
+  "contributors": [
+    "Mike Behrman"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --ui tdd test/*.js"
+  },
+  "author": "michael.behrman@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "the-works": "1.0.0",
+    "async": "0.7.0",
+    "lodash": "^2.4.1",
+    "PDL": "git+https://github.com/SQUARE-WAVES/PDL.git",
+    "path_matcher":"git+https://github.com/SQUARE-WAVES/path_matcher.git"
+
+  },
+  "devDependencies": {}
+}
