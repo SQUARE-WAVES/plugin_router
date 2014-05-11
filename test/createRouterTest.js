@@ -127,5 +127,4 @@ suite('router config',function(){
 			done();
 		});
 	});
-
 });
