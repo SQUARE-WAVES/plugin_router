@@ -40,10 +40,10 @@ suite('router config',function(){
 
 			assert.equal(router.routeTable.length,2,'this router should have 2 routes');
 
-			var matches1 = router.match('/route/1/eh');
-			var matches2 = router.match('/route/2/meh');
-			var matches3 = router.match('/dogs');
-			var matches4 = router.match('route/1/eh');
+			var matches1 = router.match('GET','/route/1/eh');
+			var matches2 = router.match('GET','/route/2/meh');
+			var matches3 = router.match('GET','/dogs');
+			var matches4 = router.match('POST','route/1/eh');
 
 			assert.equal(matches1.length,1,'the first test should only match one route');
 			assert.equal(matches2.length,1,'the second test should only match one route');
@@ -54,6 +54,8 @@ suite('router config',function(){
 
 			assert.equal(matches2[0].params.whatever,'meh','the second match should have params');
 			assert.notEqual(matches2[0].package,undefined,'the second match should have a package');
+
+			assert.equal(matches4.length,0,'the wrong method should not match');
 
 			done();
 		});
@@ -95,7 +97,7 @@ suite('router config',function(){
 
 			assert.equal(router.routeTable.length,2,'this router should have 2 routes');
 
-			var matches = router.match('/route/1/cornfish');
+			var matches = router.match('GET','/route/1/cornfish');
 
 			assert.equal(matches.length,2,'the first test match both routes');
 			var match1 = matches[0];
@@ -120,7 +122,7 @@ suite('router config',function(){
 
 			assert.equal(router.routeTable.length,0,'this router should have 2 routes');
 
-			var matches = router.match('/route/1/cornfish');
+			var matches = router.match('GET','/route/1/cornfish');
 
 			assert.equal(matches.length,0,'the first test match both routes');
 			assert.equal()
@@ -160,7 +162,7 @@ suite('router config',function(){
 		createRouter([],config,customBuilder,function(err,router){
 
 			assert.ifError(err,'there should be no errors');
-			var matches = router.match('/route/1');
+			var matches = router.match('GET','/route/1');
 			assert.equal(matches.length,1,'one route should be matched');
 			assert.equal(matches[0].package.handler,'horsehorsehorse','the custom retriever should have built things correctly');
 

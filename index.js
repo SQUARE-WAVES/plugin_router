@@ -11,19 +11,23 @@ var Router = function(schemas,packages) {
 
 	_.each(this.schemas,function(schema,name){
 		self.routeTable.push({
-			'matcher':compilePathMatcher(schema),
-			'name':name
+			'matches':compilePathMatcher(schema),
+			'name':name,
+			'schema':schema
 		});
 	});
 };
 
-Router.prototype.match = function(path) {
+Router.prototype.match = function(method,path) {
 	
 	var self = this;
 
 	return self.routeTable.map(function(route){
+
+		var match = (route.schema.method === method) && route.matches(path)
+
 		return {
-			'params': route.matcher(path),
+			'params': match,
 			'package': self.packages[route.name]
 		}
 	})
