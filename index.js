@@ -37,10 +37,15 @@ Router.prototype.match = function(reqUrl) {
 //			MEH, should this thing put up errors or something?
 //-----------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-var createRouter = function(overlays,routes,callback) {
+var createRouter = function(overlays,routes,builderCustomizations,callback) {
+
+	if(typeof(builderCustomizations) === 'function'){
+		callback = builderCustomizations;
+		builderCustomizations = undefined;
+	}
 
 	var basePackage = theWorks.config.overlay(overlays);
-	var builder = theWorks.createBuilder();
+	var builder = theWorks.createBuilder(builderCustomizations);
 
 	var routeBuilds = {};
 	var routeSchemas = {};

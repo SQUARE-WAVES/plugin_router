@@ -1,4 +1,5 @@
 var assert = require('assert');
+var createBuilder = require('the-works').createBuilder;
 var createRouter = require("../index.js").createRouter;
 
 suite('router config',function(){
@@ -127,4 +128,44 @@ suite('router config',function(){
 			done();
 		});
 	});
+
+	test('build with custom builder',function(done){
+		var customRetriever = function(path){
+			return function(options,cb){
+				cb(null,path);
+			}
+		}
+
+		var customBuilder = {
+			'custom':customRetriever
+		};
+
+		var config = {
+			'route1':{
+				'schema':{
+					'method':'GET',
+					'path':'/route/1/:whatever?',
+				},
+				'plugins':{
+					'handler':{
+						'plugin':{
+							'type':'custom',
+							'path':'horsehorsehorse'
+						}
+					}
+				}
+			}
+		};
+
+		createRouter([],config,customBuilder,function(err,router){
+
+			assert.ifError(err,'there should be no errors');
+			var matches = router.match('/route/1');
+			assert.equal(matches.length,1,'one route should be matched');
+			assert.equal(matches[0].package.handler,'horsehorsehorse','the custom retriever should have built things correctly');
+
+			done();
+
+		});
+	})
 });
