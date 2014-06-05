@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var async = require('async');
 var theWorks = require('the-works');
+var config = require('config_masticator');
 var compilePathMatcher = require('path_matcher');
 
 var Router = function(schemas,packages) {
@@ -24,11 +25,13 @@ Router.prototype.match = function(method,path) {
 
 	return self.routeTable.map(function(route){
 
-		var match = (route.schema.method === method) && route.matches(path)
+		var routeMethod = route.schema.method || 'GET';
+		var match = (routeMethod === method) && route.matches(path);
 
 		return {
 			'params': match,
-			'package': self.packages[route.name]
+			'package': self.packages[route.name],
+			'name': route.name
 		}
 	})
 	.filter(function(val){
@@ -48,15 +51,14 @@ var createRouter = function(overlays,routes,builderCustomizations,callback) {
 		builderCustomizations = undefined;
 	}
 
-	var basePackage = theWorks.config.overlay(overlays);
+	var basePackage = config.overlay(overlays);
 	var builder = theWorks.createBuilder(builderCustomizations);
 
 	var routeBuilds = {};
 	var routeSchemas = {};
 
 	_.each(routes,function(route,name){
-
-		routePackage = theWorks.config.trimout([basePackage,route.plugins]);
+		routePackage = config.trimout([basePackage,route.plugins]);
 		routeSchemas[name] = route.schema;
 		routeBuilds[name] = async.apply(builder,routePackage);
 	});
