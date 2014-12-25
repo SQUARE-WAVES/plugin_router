@@ -1,5 +1,5 @@
 {
-  "name": "plugin-router",
+  "name": "warpath-router",
   "version": "0.0.0",
   "description": "a router that uses theWorks to configure it's routes",
   "contributors": [
@@ -12,12 +12,12 @@
   "author": "michael.behrman@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "the-works": "1.0.0",
-    "async": "0.7.0",
     "lodash": "^2.4.1",
-    "PDL": "git+https://github.com/SQUARE-WAVES/PDL.git",
-    "path_matcher":"git+https://github.com/SQUARE-WAVES/path_matcher.git"
+    "path_description_language": "^1.1.0",
+    "warpath-matcher":"^1.0.1"
 
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "^2.0.1"
+  }
 }

@@ -1,173 +1,148 @@
 var assert = require('assert');
-var createBuilder = require('the-works').createBuilder;
 var createRouter = require("../index.js").createRouter;
 
 suite('router config',function(){
 
 	test('test router with normal config',function(done){
 		
-		var config = {
-			'route1':{
+		var config =[
+			{
 				'schema':{
 					'method':'GET',
-					'path':'/route/1/:whatever?',
+					'pathDescription':'/route/1/:whatever?',
 				},
-				'plugins':{
-					'handler':{
-						'plugin':'./test/testHandler.js#handler1'
-					}
-				}
+				'data':"route1!"
 			},
-			'route2':{
+			{
 				'schema':{
 					'method':'GET',
-					'path':'/route/2/:whatever?',
+					'pathDescription':'/route/2/:whatever?',
 				},
-				'plugins':{
-					'handler':{
-						'plugin':'./test/testHandler.js#handler2'
-					},
-					'notes':{
-						'value':'hooray'
-					}
-				}
+				'data':"route2!"
 			}
-		};
+		];
 
-		createRouter([],config,function(err,router){
+		var router = createRouter(config);
+		assert.equal(router.routeTable.length,2,'this router should have 2 routes');
 
-			assert.ifError(err,'there should not be an error with this config');
+		var matches1 = router.match('/route/1/eh');
+		var matches2 = router.match('/route/2/meh');
+		var matches3 = router.match('/dogs');
+		var matches4 = router.match('route/1/eh');
 
-			assert.equal(router.routeTable.length,2,'this router should have 2 routes');
+		assert.equal(matches1.length,1,'the first test should only match one route');
+		assert.equal(matches2.length,1,'the second test should only match one route');
+		assert.equal(matches3.length,0,'the third test should match neither route');
 
-			var matches1 = router.match('GET','/route/1/eh');
-			var matches2 = router.match('GET','/route/2/meh');
-			var matches3 = router.match('GET','/dogs');
-			var matches4 = router.match('POST','route/1/eh');
+		assert.equal(matches1[0].params.whatever,'eh','the first match should have params');
+		assert.notEqual(matches1[0].data,undefined,'the first match should have associated data');
 
-			assert.equal(matches1.length,1,'the first test should only match one route');
-			assert.equal(matches2.length,1,'the second test should only match one route');
-			assert.equal(matches3.length,0,'the third test should match neither route');
+		assert.equal(matches2[0].params.whatever,'meh','the second match should have params');
+		assert.notEqual(matches2[0].data,undefined,'the second match should have associated data');
 
-			assert.equal(matches1[0].params.whatever,'eh','the first match should have params');
-			assert.notEqual(matches1[0].package,undefined,'the first match should have a package');
+		assert.equal(matches4.length,0,'the wrong method should not match');
 
-			assert.equal(matches2[0].params.whatever,'meh','the second match should have params');
-			assert.notEqual(matches2[0].package,undefined,'the second match should have a package');
-
-			assert.equal(matches4.length,0,'the wrong method should not match');
-
-			done();
-		});
+		done();
 	});
 
 	test('test router with ambiguous routes',function(done){
 		
-		var config = {
-			'route1':{
+		var config = [
+			{
 				'schema':{
 					'method':'GET',
-					'path':'/route/1/cornfish',
+					'pathDescription':'/route/1/cornfish',
 				},
-				'plugins':{
-					'handler':{
-						'plugin':'./test/testHandler.js#handler1'
-					}
-				}
+				'data':'route1!'
 			},
-			'route2':{
+			{
 				'schema':{
 					'method':'GET',
-					'path':'/route/1/:whatever?',
+					'pathDescription':'/route/1/:whatever?',
 				},
-				'plugins':{
-					'handler':{
-						'plugin':'./test/testHandler.js#handler2'
-					},
-					'notes':{
-						'value':'hooray'
-					}
-				}
+				'data':'route2!'
 			}
-		};
+		];
 
-		createRouter([],config,function(err,router){
+		var router = createRouter(config);
 
-			assert.ifError(err,'there should not be an error with this config');
+		assert.equal(router.routeTable.length,2,'this router should have 2 routes');
 
-			assert.equal(router.routeTable.length,2,'this router should have 2 routes');
+		var matches = router.match('/route/1/cornfish');
 
-			var matches = router.match('GET','/route/1/cornfish');
+		assert.equal(matches.length,2,'the first test match both routes');
+		var match1 = matches[0];
+		var match2 = matches[1];
 
-			assert.equal(matches.length,2,'the first test match both routes');
-			var match1 = matches[0];
-			var match2 = matches[1];
+		assert.equal(match1.params.whatever,undefined,'the first match should not have any params');
+		assert.equal(match2.params.whatever,'cornfish','the second match should have params');
 
-			assert.equal(match1.params.whatever,undefined,'the first match should not have any params');
-			assert.equal(match2.params.whatever,'cornfish','the second match should have params');
+		assert.equal()
 
-			assert.equal()
-
-			done();
-		});
+		done();
 	});
 
 	test('test router with no routes',function(done){
 		
-		var config = {};
+		var config = [];
 
-		createRouter([],config,function(err,router){
+		var router = createRouter(config);
 
-			assert.ifError(err,'there should not be an error with this config');
+		assert.equal(router.routeTable.length,0,'this router should have no routes');
 
-			assert.equal(router.routeTable.length,0,'this router should have 2 routes');
+		var matches = router.match('/route/1/cornfish');
 
-			var matches = router.match('GET','/route/1/cornfish');
+		assert.equal(matches.length,0,'nothing should match');
+		assert.equal()
 
-			assert.equal(matches.length,0,'the first test match both routes');
-			assert.equal()
+		done();
 
-			done();
-		});
 	});
+});
 
-	test('build with custom builder',function(done){
-		var customRetriever = function(path){
-			return function(options,cb){
-				cb(null,path);
-			}
-		}
+suite('perf testing',function(){
 
-		var customBuilder = {
-			'custom':customRetriever
-		};
+	var config = [];
+	var routecount = 1000;
 
-		var config = {
-			'route1':{
+	test('routes with no params',function(done){
+
+		var createRoute = function(conf,name){
+
+			conf.push({
 				'schema':{
 					'method':'GET',
-					'path':'/route/1/:whatever?',
+					'pathDescription':'/route/'+name,
 				},
-				'plugins':{
-					'handler':{
-						'plugin':{
-							'type':'custom',
-							'path':'horsehorsehorse'
-						}
-					}
-				}
-			}
-		};
+				'data':'horsefestival'
+			});
+		}
 
-		createRouter([],config,customBuilder,function(err,router){
+		for(var i=0; i<routecount; i++) {
+			createRoute(config,'zapp'+i)
+		}
 
-			assert.ifError(err,'there should be no errors');
-			var matches = router.match('GET','/route/1');
-			assert.equal(matches.length,1,'one route should be matched');
-			assert.equal(matches[0].package.handler,'horsehorsehorse','the custom retriever should have built things correctly');
+		//test using the final route name
+		var testName = 'zapp5'
 
-			done();
+		var router = createRouter(config);
 
-		});
-	})
+		var lrStart = new Date().valueOf();
+		var startTime = process.hrtime();
+
+		var matches = router.match('/route/'+testName);
+		var endTime = process.hrtime(startTime);
+		var lrEnd = (new Date().valueOf()) - lrStart;
+
+		assert.equal(matches.length,1,'one route should be matched');
+
+		console.log('------------------------------------------------');
+		console.log('--------------------------------');
+		console.log("time to scan "+routecount+" routes");
+		console.log('benchmark took %d nanoseconds', endTime[0] * 1e9 + endTime[1]);
+		console.log('--------------------------------');
+		console.log('------------------------------------------------');
+
+		done();
+	});
 });

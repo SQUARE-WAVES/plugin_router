@@ -1,76 +1,54 @@
-var _ = require('lodash');
-var async = require('async');
-var theWorks = require('the-works');
-var config = require('config_masticator');
-var compilePathMatcher = require('path_matcher');
+var compilePathMatcher = require('warpath-matcher');
 
-var Router = function(schemas,packages) {
-	var self = this;
-	this.routeTable = [];
-	this.packages = packages;
-	this.schemas = schemas;
+var Router = function(config) {
 
-	_.each(this.schemas,function(schema,name){
-		self.routeTable.push({
-			'matches':compilePathMatcher(schema),
-			'name':name,
-			'schema':schema
-		});
-	});
-};
-
-Router.prototype.match = function(method,path) {
-	
-	var self = this;
-
-	return self.routeTable.map(function(route){
-
-		var routeMethod = route.schema.method || 'GET';
-		var match = (routeMethod === method) && route.matches(path);
-
+	this.routeTable = config.map(function(routeObject){
 		return {
-			'params': match,
-			'package': self.packages[route.name],
-			'name': route.name
+			'matches':compilePathMatcher(routeObject.schema),
+			'data':routeObject.data
 		}
-	})
-	.filter(function(val){
-		return val.params !== false;
 	});
 };
 
-//-------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//			MEH, should this thing put up errors or something?
-//-----------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-var createRouter = function(overlays,routes,builderCustomizations,callback) {
+Router.prototype.match = function(path) {
+	var self = this;
+	var matches = [];
 
-	if(typeof(builderCustomizations) === 'function'){
-		callback = builderCustomizations;
-		builderCustomizations = undefined;
+	self.routeTable.forEach(function(route){
+		var ret = route.matches(path);
+
+		if(ret !== false) {
+			matches.push({
+				'params':ret,
+				'data':route.data
+			});
+		}
+	});
+
+	return matches;
+};
+
+//-----------------------------------------------------------------------------
+// config here consits of a list of routes with their associated data
+// something like [{schema:xxx, data:yyy},...]
+//-----------------------------------------------------------------------------
+
+var createRouter = function(config) {
+	return new Router(config);
+}
+
+var worksConstructor = function(options,cb) {
+	var router;
+	try{
+		router = createRouter(options)
+	}
+	catch(exc){
+		cb(exc,null);
 	}
 
-	var basePackage = config.overlay(overlays);
-	var builder = theWorks.createBuilder(builderCustomizations);
-
-	var routeBuilds = {};
-	var routeSchemas = {};
-
-	_.each(routes,function(route,name){
-		routePackage = config.trimout([basePackage,route.plugins]);
-		routeSchemas[name] = route.schema;
-		routeBuilds[name] = async.apply(builder,routePackage);
-	});
-
-	async.parallel(routeBuilds,function(err,routePackages){
-		if(err){
-			callback(err,null);
-		}
-
-		callback(null,new Router(routeSchemas,routePackages));
-	});
+	cb(null,router);
 }
 
 module.exports.createRouter = createRouter;
+module.exports.works = worksConstructor;
 
