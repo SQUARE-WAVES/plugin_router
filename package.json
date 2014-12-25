@@ -1,6 +1,6 @@
 {
   "name": "warpath-router",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "a router that uses theWorks to configure it's routes",
   "contributors": [
     "Mike Behrman"
@@ -14,8 +14,7 @@
   "dependencies": {
     "lodash": "^2.4.1",
     "path_description_language": "^1.1.0",
-    "warpath-matcher":"^1.0.1"
-
+    "warpath-matcher": "^1.0.1"
   },
   "devDependencies": {
     "mocha": "^2.0.1"
