@@ -139,7 +139,10 @@ suite('perf testing',function(){
 		console.log('------------------------------------------------');
 		console.log('--------------------------------');
 		console.log("time to scan "+routecount+" routes");
-		console.log('benchmark took %d nanoseconds', endTime[0] * 1e9 + endTime[1]);
+		var ns = endTime[0] * 1e9 + endTime[1];
+
+		console.log('benchmark took %d nanoseconds', ns);
+		console.log('aka %d us, and %d ms',ns/1000, ns/1000000); 
 		console.log('--------------------------------');
 		console.log('------------------------------------------------');
 

@@ -2,6 +2,10 @@
   "name": "warpath-router",
   "version": "1.0.0",
   "description": "a router that uses theWorks to configure it's routes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SQUARE-WAVES/plugin_router.git"
+  },
   "contributors": [
     "Mike Behrman"
   ],
