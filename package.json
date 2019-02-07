@@ -16,11 +16,11 @@
   "author": "michael.behrman@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^2.4.1",
+    "lodash": "^4.17.11",
     "path_description_language": "^1.1.0",
     "warpath-matcher": "^1.0.2"
   },
   "devDependencies": {
-    "mocha": "^2.0.1"
+    "mocha": "^5.2.0"
   }
 }
