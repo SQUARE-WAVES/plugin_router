@@ -1,6 +1,6 @@
 {
   "name": "warpath-router",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a router that uses theWorks to configure it's routes",
   "repository": {
     "type": "git",
